@@ -29,8 +29,6 @@ public class Main {
         // insecureRuntime_ArgumentInjection();
         // secureRuntime();
 
-        // Python3/Bash script.py <userinput>     #Securer: But if the python script has some arg, it maybe exploited
-        // Python3/Bash <userinput>               #InSecuree: We can give -c import os
     }
 
 
@@ -78,7 +76,7 @@ public class Main {
 
     private static void insecurePB_DirectInput() throws IOException,InterruptedException {
         String userInput = "whoami";                  //Only single command without space will work
-        // String userInput2 = "/bin/touch test";         //Error: Program "touch test" not found, coz the whole is treated as the binary name
+        // String userInput2 = "/bin/touch test";       Error
 
         ProcessBuilder pb = new ProcessBuilder(userInput);
         Process processInfo = pb.start();
@@ -87,7 +85,7 @@ public class Main {
 
 
     private static void insecurePB_DirectInput_SpaceSplit() throws IOException,InterruptedException {
-        String userInput = "touch /tmp/testing/hacker1";        //Since userInput is split in below line, it will be valid => [touch, "/tmp/testing/hacker3"]
+        String userInput = "touch /tmp/testing/hacker1";        // => [touch, "/tmp/testing/hacker3"]
         String[] cmdList = userInput.split(" ");
 
         ProcessBuilder pb = new ProcessBuilder(cmdList);
@@ -111,7 +109,7 @@ public class Main {
         //Vuln
         ProcessBuilder pb = new ProcessBuilder("/bin/sh","-c", "curl" + userInput);
 
-        //Vuln in Linux, but strange that adding this space after curl does not work in MAC
+        //Vuln
         ProcessBuilder pb2 = new ProcessBuilder("/bin/sh","-c", "curl " + userInput);
 
         ////Safe: As "curl + userInpuy" will be treated as binaryname, errors with program not found
@@ -196,8 +194,8 @@ public class Main {
 
     private static void insecureRuntime_DirectInput() throws IOException,InterruptedException {
         String userInput = "touch /tmp/testing/xhacker1";
-        String exploitPayload = "sh -c $@|sh . touch /tmp/testing/xhacker2";    //sh -c "cmd here" directly won't work as everything is passed as arg to sh. This is a bypass
-        Process process = Runtime.getRuntime().exec(userInput);      //userInput is automatically split on the spaces, userInput[0]=program and rest as Args
+        String exploitPayload = "sh -c $@|sh . touch /tmp/testing/xhacker2";    //Vuln
+        Process process = Runtime.getRuntime().exec(userInput);                //userInput is automatically split on the spaces, userInput[0]=program and rest as Args
         printRuntimeOutput("insecureRuntime_DirectInput()", process);
     }
 
@@ -222,6 +220,7 @@ public class Main {
 
 
     private static void secureRuntime() throws IOException,InterruptedException {
+        // 0)Avoid using Runtime or ProcessBuilder if possible
         // 1)Sanitize the Input
         // 2)Whitelist Command
         // 3)Use ProcessBuilder() as it parses entire userInput as single command
